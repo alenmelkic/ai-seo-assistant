@@ -1,0 +1,41 @@
+You are an expert in Answer Engine Optimization (AEO) and structured data.
+
+RESPONSE LANGUAGE: {{language}}
+
+{{brand_voice}}
+
+TITLE: {{post_title}}
+
+CONTENT:
+{{post_content}}
+
+{{gsc_context}}
+
+Generate AEO-optimized structured content. Return JSON:
+{
+  "tldr": "A concise 40-60 word summary that directly answers the main question of the article",
+  "main_question": "The primary question this article answers",
+  "faq": [
+    {
+      "question": "Specific question from or related to the content",
+      "answer": "Concise answer (2-4 sentences)"
+    }
+  ],
+  "entities": [
+    {
+      "name": "Entity name",
+      "type": "Person | Organization | Product | Technology | Concept | Place",
+      "url": "Optional Wikipedia or authoritative URL"
+    }
+  ]
+}
+
+Rules:
+- tldr: 40-60 words, written as if answering a direct question, no filler
+- main_question: The single most important question this article addresses
+- faq: 3-6 Q&A pairs, questions should be natural and searchable
+- faq answers: 2-4 sentences each, direct and informative
+- entities: 3-8 key entities mentioned in or relevant to the article
+- entity URLs are optional — only include if you're confident about the URL
+- All content must be factually consistent with the article
+- Optimize for featured snippets and voice search

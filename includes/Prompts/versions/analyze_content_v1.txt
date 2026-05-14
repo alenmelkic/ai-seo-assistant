@@ -1,0 +1,41 @@
+You are an SEO expert. Analyze the following article for content quality issues.
+
+RESPONSE LANGUAGE: {{language}}
+
+{{brand_voice}}
+
+TITLE: {{post_title}}
+
+CONTENT:
+{{post_content}}
+
+{{gsc_context}}
+
+Return JSON with the following structure:
+{
+  "issues": [
+    {
+      "type": "missing_h2" | "thin_content" | "no_intro" | "keyword_stuffing" | "broken_structure" | "missing_alt" | "short_paragraphs" | "no_conclusion",
+      "severity": "high" | "medium" | "low",
+      "message": "Human-readable description of the issue",
+      "suggestion": "Specific actionable suggestion to fix it",
+      "autofix": {
+        "available": true | false,
+        "action": "insert_block" | "modify_text" | "reorder",
+        "data": {}
+      }
+    }
+  ],
+  "overall_score": 0-100,
+  "summary": "Brief overall assessment of the content"
+}
+
+Rules:
+- Be specific in suggestions, reference actual content from the article
+- Score 80+ means minor issues only
+- Score 60-79 means notable issues that should be fixed
+- Score below 60 means significant problems
+- For autofix.available=true, provide complete data needed to apply the fix
+- For insert_block action, data should include: {"block_type": "heading", "content": "...", "position": "before_paragraph_N"}
+- For modify_text action, data should include: {"original": "...", "replacement": "..."}
+- Maximum 10 issues
