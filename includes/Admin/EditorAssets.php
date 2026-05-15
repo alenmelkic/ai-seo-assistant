@@ -59,7 +59,7 @@ class EditorAssets
             $asset['version']
         );
 
-        wp_localize_script('aisa-editor', 'aiSeoAssistant', [
+        $scriptData = [
             'restUrl' => rest_url('ai-seo-assistant/v1/'),
             'nonce' => wp_create_nonce('wp_rest'),
             'postId' => get_the_ID(),
@@ -69,6 +69,11 @@ class EditorAssets
                 'language' => $settings['language'],
             ],
             'hasAbilitiesApi' => function_exists('register_ability'),
-        ]);
+        ];
+
+        // Allow Phase 2+ modules to add data (bypass, multilingual, etc.)
+        $scriptData = apply_filters('aisa_editor_script_data', $scriptData);
+
+        wp_localize_script('aisa-editor', 'aiSeoAssistant', $scriptData);
     }
 }

@@ -10,6 +10,9 @@ use AiSeoAssistant\AI\AIServiceFactory;
 use AiSeoAssistant\AEO\JsonLdRenderer;
 use AiSeoAssistant\REST\RestController;
 use AiSeoAssistant\Support\PostTypeRegistry;
+use AiSeoAssistant\Tracking\DashboardWidget;
+use AiSeoAssistant\Bulk\BulkScheduler;
+use AiSeoAssistant\Access\BypassManager;
 
 class Plugin
 {
@@ -47,6 +50,9 @@ class Plugin
             add_action('admin_menu', [new AdminMenu(), 'register']);
             add_action('admin_enqueue_scripts', [new EditorAssets(), 'enqueue']);
             add_action('admin_init', [new PostTypeRegistry(), 'detectNewPostTypes']);
+
+            // Dashboard widget (Phase 2)
+            add_action('wp_dashboard_setup', [new DashboardWidget(), 'register']);
         }
 
         // Post meta registration (needed for REST API)
@@ -64,6 +70,27 @@ class Plugin
         if (function_exists('register_ability')) {
             add_action('init', [$this, 'registerAbilities']);
         }
+
+        // Bulk Scheduler hooks (Phase 2)
+        $bulkScheduler = new BulkScheduler();
+        $bulkScheduler->register();
+
+        // WP-CLI commands (Phase 2)
+        if (defined('WP_CLI') && WP_CLI) {
+            \WP_CLI::add_command('aisa', CLI\BulkSEOCommand::class);
+        }
+
+        // Localize bypass capability info for JS (Phase 2)
+        add_filter('aisa_editor_script_data', [$this, 'addBypassData']);
+    }
+
+    /**
+     * Add bypass capability data to the editor script localization.
+     */
+    public function addBypassData(array $data): array
+    {
+        $data['canBypass'] = BypassManager::canBypass();
+        return $data;
     }
 
     public function registerAbilities(): void

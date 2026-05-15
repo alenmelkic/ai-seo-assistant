@@ -9,6 +9,11 @@ class Activator
         self::createDefaultOptions();
         self::addCustomCapability();
         self::createLogTable();
+        self::createAuditTable();
+        self::createBulkBatchesTable();
+        self::createABTestTable();
+
+        Access\BypassManager::addCapability();
 
         flush_rewrite_rules();
     }
@@ -31,6 +36,13 @@ class Activator
             'audience_description' => '',
             'active_post_types' => ['post'],
             'rate_limit' => 10,
+            'rate_limits_per_role' => [
+                'administrator' => 50,
+                'editor' => 20,
+                'author' => 10,
+                'contributor' => 5,
+            ],
+            'global_daily_cap' => 500,
             'failure_behavior' => 'skip',
             'headless_mode' => false,
             'headless_webhook_url' => '',
@@ -91,6 +103,93 @@ class Activator
             PRIMARY KEY (id),
             INDEX idx_post_id (post_id),
             INDEX idx_created_at (created_at)
+        ) {$charset_collate};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    }
+
+    private static function createAuditTable(): void
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'aisa_audit_log';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+            id BIGINT AUTO_INCREMENT,
+            post_id BIGINT NOT NULL,
+            user_id BIGINT NOT NULL,
+            action VARCHAR(50) NOT NULL,
+            field VARCHAR(100) NOT NULL,
+            previous_value LONGTEXT NULL,
+            new_value LONGTEXT NULL,
+            ai_suggestion LONGTEXT NULL,
+            source VARCHAR(50) NOT NULL DEFAULT 'modal',
+            metadata JSON NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_post_id (post_id),
+            INDEX idx_user_id (user_id),
+            INDEX idx_action (action),
+            INDEX idx_created_at (created_at)
+        ) {$charset_collate};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    }
+
+    private static function createBulkBatchesTable(): void
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'aisa_bulk_batches';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+            id BIGINT AUTO_INCREMENT,
+            batch_id VARCHAR(36) NOT NULL,
+            user_id BIGINT NOT NULL,
+            post_ids JSON NOT NULL,
+            total_posts INT NOT NULL DEFAULT 0,
+            processed_posts INT NOT NULL DEFAULT 0,
+            status VARCHAR(20) NOT NULL DEFAULT 'pending',
+            source VARCHAR(20) NOT NULL DEFAULT 'admin_ui',
+            results LONGTEXT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE INDEX idx_batch_id (batch_id),
+            INDEX idx_status (status),
+            INDEX idx_created_at (created_at)
+        ) {$charset_collate};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    }
+
+    private static function createABTestTable(): void
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'aisa_ab_tests';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+            id BIGINT AUTO_INCREMENT,
+            ability VARCHAR(50) NOT NULL,
+            variant_a VARCHAR(20) NOT NULL,
+            variant_b VARCHAR(20) NOT NULL,
+            traffic_split INT NOT NULL DEFAULT 50,
+            status VARCHAR(20) NOT NULL DEFAULT 'active',
+            impressions_a INT NOT NULL DEFAULT 0,
+            impressions_b INT NOT NULL DEFAULT 0,
+            accepts_a INT NOT NULL DEFAULT 0,
+            accepts_b INT NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            ended_at DATETIME NULL,
+            PRIMARY KEY (id),
+            INDEX idx_ability_status (ability, status)
         ) {$charset_collate};";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';

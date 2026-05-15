@@ -16,6 +16,10 @@ class RestController
         $webhook->registerRoutes();
 
         $this->registerAEORoute();
+
+        // Phase 2: Bulk, Audit, Stats routes
+        $bulk = new BulkController();
+        $bulk->registerRoutes();
     }
 
     private function registerAEORoute(): void

@@ -225,13 +225,44 @@ class SettingsPage
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="aisa_rate_limit"><?php esc_html_e('Rate Limit', 'ai-seo-assistant'); ?></label>
+                            <label for="aisa_rate_limit"><?php esc_html_e('Rate Limit (Legacy)', 'ai-seo-assistant'); ?></label>
                         </th>
                         <td>
                             <input type="number" name="aisa_settings[rate_limit]" id="aisa_rate_limit"
                                    value="<?php echo esc_attr($settings['rate_limit']); ?>"
                                    min="1" max="100" class="small-text" />
-                            <span class="description"><?php esc_html_e('Max regenerations per article per user per hour', 'ai-seo-assistant'); ?></span>
+                            <span class="description"><?php esc_html_e('Max regenerations per article per user per hour (fallback)', 'ai-seo-assistant'); ?></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Rate Limits per Role', 'ai-seo-assistant'); ?></th>
+                        <td>
+                            <?php
+                            $role_limits = $settings['rate_limits_per_role'] ?? [
+                                'administrator' => 50, 'editor' => 20, 'author' => 10, 'contributor' => 5,
+                            ];
+                            foreach ($role_limits as $role => $limit): ?>
+                                <p>
+                                    <label><?php echo esc_html(ucfirst($role)); ?>:
+                                        <input type="number"
+                                               name="aisa_settings[rate_limits_per_role][<?php echo esc_attr($role); ?>]"
+                                               value="<?php echo esc_attr($limit); ?>"
+                                               min="1" max="200" class="small-text" />
+                                        <?php esc_html_e('per hour', 'ai-seo-assistant'); ?>
+                                    </label>
+                                </p>
+                            <?php endforeach; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="aisa_global_daily_cap"><?php esc_html_e('Global Daily Cap', 'ai-seo-assistant'); ?></label>
+                        </th>
+                        <td>
+                            <input type="number" name="aisa_settings[global_daily_cap]" id="aisa_global_daily_cap"
+                                   value="<?php echo esc_attr($settings['global_daily_cap'] ?? 500); ?>"
+                                   min="10" max="10000" class="small-text" />
+                            <span class="description"><?php esc_html_e('Max AI calls per day across all users', 'ai-seo-assistant'); ?></span>
                         </td>
                     </tr>
                     <tr>
@@ -391,6 +422,8 @@ class SettingsPage
             'audience_description' => sanitize_textarea_field($input['audience_description'] ?? ''),
             'active_post_types' => array_map('sanitize_text_field', $input['active_post_types'] ?? []),
             'rate_limit' => absint($input['rate_limit'] ?? $defaults['rate_limit']),
+            'rate_limits_per_role' => array_map('absint', $input['rate_limits_per_role'] ?? $defaults['rate_limits_per_role']),
+            'global_daily_cap' => max(10, min(10000, absint($input['global_daily_cap'] ?? 500))),
             'failure_behavior' => in_array($input['failure_behavior'] ?? '', ['skip', 'block']) ? $input['failure_behavior'] : $defaults['failure_behavior'],
             'headless_mode' => !empty($input['headless_mode']),
             'headless_webhook_url' => esc_url_raw($input['headless_webhook_url'] ?? ''),
