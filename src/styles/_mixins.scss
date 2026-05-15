@@ -1,0 +1,19 @@
+@mixin aisa-card {
+	background: $aisa-bg;
+	border: 1px solid $aisa-border-light;
+	border-radius: $aisa-radius;
+	padding: $aisa-spacing-md;
+}
+
+@mixin aisa-skeleton {
+	background: linear-gradient(90deg, $aisa-bg-light 25%, #e8e8e8 50%, $aisa-bg-light 75%);
+	background-size: 200% 100%;
+	animation: aisa-shimmer 1.5s ease-in-out infinite;
+	border-radius: $aisa-radius;
+	height: 60px;
+}
+
+@keyframes aisa-shimmer {
+	0% { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
+}

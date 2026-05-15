@@ -54,9 +54,9 @@ class EditorAssets
 
         wp_enqueue_style(
             'aisa-editor',
-            AISA_PLUGIN_URL . 'assets/css/editor.css',
+            AISA_PLUGIN_URL . 'assets/js/index.css',
             ['wp-components'],
-            AISA_VERSION
+            $asset['version']
         );
 
         wp_localize_script('aisa-editor', 'aiSeoAssistant', [

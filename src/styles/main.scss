@@ -1,0 +1,527 @@
+@import 'variables';
+@import 'mixins';
+
+// ============================================================
+// Modal
+// ============================================================
+.aisa-modal {
+	.components-modal__content {
+		padding: 0;
+	}
+
+	.components-modal__header {
+		display: none; // We use our own header
+	}
+
+	max-width: 800px;
+	width: 90vw;
+}
+
+.aisa-modal__content {
+	padding: $aisa-spacing-lg;
+	max-height: 60vh;
+	overflow-y: auto;
+}
+
+.aisa-modal__footer {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: $aisa-spacing-sm;
+	padding: $aisa-spacing-md $aisa-spacing-lg;
+	border-top: 1px solid $aisa-border-light;
+	background: $aisa-bg-light;
+}
+
+.aisa-modal__skip-btn {
+	margin-right: auto;
+}
+
+// ============================================================
+// Modal Header
+// ============================================================
+.aisa-modal-header {
+	padding: $aisa-spacing-md $aisa-spacing-lg;
+	border-bottom: 1px solid $aisa-border-light;
+
+	&__title {
+		margin: 0 0 $aisa-spacing-md;
+		font-size: 18px;
+		font-weight: 600;
+	}
+}
+
+// ============================================================
+// Step Indicator
+// ============================================================
+.aisa-step-indicator {
+	display: flex;
+	align-items: center;
+	gap: $aisa-spacing-sm;
+
+	&__step {
+		display: flex;
+		align-items: center;
+		gap: $aisa-spacing-xs;
+		color: $aisa-text-muted;
+
+		&--active {
+			color: $aisa-primary;
+			font-weight: 600;
+		}
+
+		&--completed {
+			color: $aisa-success;
+		}
+	}
+
+	&__number {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 12px;
+		font-weight: 600;
+		border: 2px solid currentColor;
+
+		.aisa-step-indicator__step--active & {
+			background: $aisa-primary;
+			color: #fff;
+			border-color: $aisa-primary;
+		}
+
+		.aisa-step-indicator__step--completed & {
+			background: $aisa-success;
+			color: #fff;
+			border-color: $aisa-success;
+		}
+	}
+
+	&__label {
+		font-size: 13px;
+	}
+
+	&__connector {
+		width: 40px;
+		height: 2px;
+		background: $aisa-border-light;
+		margin: 0 $aisa-spacing-xs;
+	}
+}
+
+// ============================================================
+// Step 1 - Content Review
+// ============================================================
+.aisa-step1-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: $aisa-spacing-xl;
+	color: $aisa-text-muted;
+}
+
+.aisa-step1__score-bar {
+	display: flex;
+	align-items: center;
+	gap: $aisa-spacing-md;
+	margin-bottom: $aisa-spacing-lg;
+	padding: $aisa-spacing-md;
+	background: $aisa-bg-light;
+	border-radius: $aisa-radius-lg;
+}
+
+.aisa-step1__score {
+	display: flex;
+	align-items: baseline;
+}
+
+.aisa-step1__score-number {
+	font-size: 32px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.aisa-step1__score-label {
+	font-size: 14px;
+	color: $aisa-text-muted;
+	margin-left: 2px;
+}
+
+.aisa-step1__summary {
+	flex: 1;
+	margin: 0;
+	font-size: 13px;
+	color: $aisa-text-muted;
+}
+
+.aisa-step1__issues {
+	display: flex;
+	flex-direction: column;
+	gap: $aisa-spacing-sm;
+}
+
+// ============================================================
+// Issue Card
+// ============================================================
+.aisa-issue-card {
+	&__header {
+		display: flex;
+		align-items: center;
+		gap: $aisa-spacing-sm;
+		margin-bottom: $aisa-spacing-sm;
+	}
+
+	&__type {
+		font-size: 12px;
+		color: $aisa-text-muted;
+		text-transform: uppercase;
+	}
+
+	&__message {
+		margin: 0 0 $aisa-spacing-sm;
+		font-size: 13px;
+	}
+
+	&__suggestion {
+		margin-bottom: $aisa-spacing-sm;
+		padding: $aisa-spacing-sm;
+		background: $aisa-bg-light;
+		border-radius: $aisa-radius;
+		font-size: 13px;
+	}
+
+	&__actions {
+		display: flex;
+		gap: $aisa-spacing-sm;
+		align-items: center;
+	}
+
+	&__dismiss {
+		background: none;
+		border: none;
+		color: $aisa-text-muted;
+		cursor: pointer;
+		font-size: 12px;
+		padding: $aisa-spacing-xs $aisa-spacing-sm;
+
+		&:hover {
+			color: $aisa-text;
+		}
+	}
+}
+
+// Severity badges
+.aisa-severity-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+
+	&--high {
+		background: rgba($aisa-error, 0.1);
+		color: $aisa-error;
+	}
+
+	&--medium {
+		background: rgba($aisa-warning, 0.1);
+		color: darken($aisa-warning, 10%);
+	}
+
+	&--low {
+		background: rgba($aisa-info, 0.1);
+		color: darken($aisa-info, 20%);
+	}
+}
+
+// ============================================================
+// Step 2 - SEO Generation
+// ============================================================
+.aisa-step2__loading-bar {
+	display: flex;
+	align-items: center;
+	gap: $aisa-spacing-sm;
+	padding: $aisa-spacing-sm $aisa-spacing-md;
+	background: rgba($aisa-primary, 0.05);
+	border-radius: $aisa-radius;
+	margin-bottom: $aisa-spacing-md;
+	font-size: 13px;
+	color: $aisa-primary;
+}
+
+.aisa-step2__section {
+	margin-bottom: $aisa-spacing-lg;
+	padding-bottom: $aisa-spacing-lg;
+	border-bottom: 1px solid $aisa-border-light;
+
+	&:last-child {
+		border-bottom: none;
+		margin-bottom: 0;
+		padding-bottom: 0;
+	}
+}
+
+// ============================================================
+// Fields
+// ============================================================
+.aisa-field {
+	margin-bottom: $aisa-spacing-md;
+
+	&__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: $aisa-spacing-sm;
+	}
+
+	&__label {
+		font-weight: 600;
+		font-size: 13px;
+	}
+
+	&__actions {
+		display: flex;
+		gap: $aisa-spacing-sm;
+		align-items: center;
+	}
+
+	&__counter {
+		text-align: right;
+		font-size: 12px;
+		color: $aisa-text-muted;
+		margin-top: $aisa-spacing-xs;
+
+		&--over {
+			color: $aisa-error;
+			font-weight: 600;
+		}
+	}
+}
+
+// ============================================================
+// AEO Fields
+// ============================================================
+.aisa-aeo-section {
+	margin-bottom: $aisa-spacing-md;
+
+	h4 {
+		margin: 0 0 $aisa-spacing-sm;
+		font-size: 13px;
+		font-weight: 600;
+	}
+}
+
+.aisa-faq-item {
+	margin-bottom: $aisa-spacing-sm;
+}
+
+.aisa-entities {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $aisa-spacing-xs;
+}
+
+.aisa-entity-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: $aisa-spacing-xs;
+	padding: 3px 8px;
+	background: $aisa-bg-light;
+	border: 1px solid $aisa-border-light;
+	border-radius: 12px;
+	font-size: 12px;
+
+	&__type {
+		color: $aisa-text-muted;
+		font-size: 10px;
+		text-transform: uppercase;
+	}
+
+	&__remove {
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: $aisa-text-muted;
+		font-size: 14px;
+		padding: 0;
+		line-height: 1;
+
+		&:hover {
+			color: $aisa-error;
+		}
+	}
+}
+
+// ============================================================
+// Diff View
+// ============================================================
+.aisa-diff {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: $aisa-spacing-sm;
+	margin-top: $aisa-spacing-sm;
+	padding: $aisa-spacing-sm;
+	background: $aisa-bg-light;
+	border-radius: $aisa-radius;
+	font-size: 13px;
+
+	&--tags,
+	&--faq {
+		grid-template-columns: 1fr;
+	}
+
+	&__side {
+		min-width: 0;
+	}
+
+	&__label {
+		font-size: 11px;
+		font-weight: 600;
+		text-transform: uppercase;
+		color: $aisa-text-muted;
+		margin-bottom: $aisa-spacing-xs;
+	}
+
+	&__content {
+		word-break: break-word;
+		white-space: pre-wrap;
+	}
+
+	&__added {
+		background: rgba($aisa-success, 0.15);
+		padding: 1px 2px;
+		border-radius: 2px;
+	}
+
+	&__removed {
+		background: rgba($aisa-error, 0.15);
+		padding: 1px 2px;
+		border-radius: 2px;
+		text-decoration: line-through;
+	}
+
+	&__tags-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: $aisa-spacing-xs;
+	}
+
+	&__tag {
+		padding: 2px 8px;
+		border-radius: 3px;
+		font-size: 12px;
+		background: $aisa-bg;
+		border: 1px solid $aisa-border-light;
+	}
+
+	&__faq-item {
+		margin-bottom: $aisa-spacing-sm;
+		padding-bottom: $aisa-spacing-sm;
+		border-bottom: 1px solid $aisa-border-light;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+}
+
+// ============================================================
+// Regenerate Button
+// ============================================================
+.aisa-regenerate-btn {
+	.components-spinner {
+		margin-right: $aisa-spacing-xs;
+	}
+}
+
+// ============================================================
+// Sidebar
+// ============================================================
+.aisa-sidebar__status {
+	display: flex;
+	align-items: center;
+	gap: $aisa-spacing-sm;
+	width: 100%;
+}
+
+.aisa-status-badge {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 3px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.aisa-status--not-reviewed {
+	background: rgba($aisa-warning, 0.15);
+	color: darken($aisa-warning, 15%);
+}
+
+.aisa-status--confirmed {
+	background: rgba($aisa-success, 0.15);
+	color: $aisa-success;
+}
+
+.aisa-status--skipped {
+	background: rgba($aisa-text-muted, 0.15);
+	color: $aisa-text-muted;
+}
+
+.aisa-sidebar__date {
+	font-size: 12px;
+	color: $aisa-text-muted;
+	cursor: help;
+}
+
+.aisa-sidebar__field {
+	width: 100%;
+
+	strong {
+		display: block;
+		font-size: 12px;
+		margin-bottom: $aisa-spacing-xs;
+	}
+
+	p {
+		margin: 0;
+		font-size: 13px;
+		color: $aisa-text-muted;
+	}
+}
+
+// ============================================================
+// Skeleton loading
+// ============================================================
+.aisa-skeleton {
+	@include aisa-skeleton;
+
+	&--large {
+		height: 120px;
+	}
+}
+
+// ============================================================
+// Error Boundary
+// ============================================================
+.aisa-error-boundary {
+	padding: $aisa-spacing-lg;
+	text-align: center;
+	color: $aisa-text-muted;
+
+	&__detail {
+		font-size: 12px;
+		color: $aisa-error;
+		margin-bottom: $aisa-spacing-md;
+	}
+}
+
+// ============================================================
+// Auto-fix button
+// ============================================================
+.aisa-autofix-btn {
+	font-size: 12px;
+}
