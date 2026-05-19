@@ -20,6 +20,10 @@ class RestController
         // Phase 2: Bulk, Audit, Stats routes
         $bulk = new BulkController();
         $bulk->registerRoutes();
+
+        // Phase 1.5: Suggestions + GSC routes
+        $suggestions = new SuggestionsController();
+        $suggestions->registerRoutes();
     }
 
     private function registerAEORoute(): void

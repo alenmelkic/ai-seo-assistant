@@ -525,3 +525,34 @@
 .aisa-autofix-btn {
 	font-size: 12px;
 }
+
+// ============================================================
+// GSC Panel (Phase 1.5)
+// ============================================================
+.aisa-gsc-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+	margin-top: $aisa-spacing-xs;
+
+	th {
+		text-align: left;
+		font-weight: 600;
+		padding: 4px 6px;
+		border-bottom: 1px solid $aisa-border-light;
+		color: $aisa-text-muted;
+		font-size: 11px;
+	}
+
+	td {
+		padding: 4px 6px;
+		border-bottom: 1px solid $aisa-border-light;
+	}
+}
+
+.aisa-gsc-query-text {
+	max-width: 140px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

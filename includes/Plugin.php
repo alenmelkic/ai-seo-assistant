@@ -13,6 +13,12 @@ use AiSeoAssistant\Support\PostTypeRegistry;
 use AiSeoAssistant\Tracking\DashboardWidget;
 use AiSeoAssistant\Bulk\BulkScheduler;
 use AiSeoAssistant\Access\BypassManager;
+use AiSeoAssistant\GSC\GSCAuthHandler;
+use AiSeoAssistant\GSC\GSCContextBuilder;
+use AiSeoAssistant\Scan\WeeklyScan;
+use AiSeoAssistant\Scan\EmailDigest;
+use AiSeoAssistant\Scan\OutcomeTracker;
+use AiSeoAssistant\Scan\PerformanceDashboardWidget;
 
 class Plugin
 {
@@ -82,6 +88,28 @@ class Plugin
 
         // Localize bypass capability info for JS (Phase 2)
         add_filter('aisa_editor_script_data', [$this, 'addBypassData']);
+
+        // Phase 1.5: GSC OAuth callback handler
+        add_action('admin_init', [GSCAuthHandler::class, 'handleCallback']);
+
+        // Phase 1.5: Weekly scan + digest + outcome crons
+        add_action('init', [WeeklyScan::class, 'schedule']);
+        add_action('init', [EmailDigest::class, 'schedule']);
+        add_action('init', [OutcomeTracker::class, 'schedule']);
+        add_action('aisa_weekly_scan', [WeeklyScan::class, 'run']);
+        add_action('aisa_weekly_digest', [EmailDigest::class, 'send']);
+        add_action('aisa_outcome_check', [OutcomeTracker::class, 'check']);
+
+        // Phase 1.5: Performance dashboard widget
+        if (is_admin()) {
+            add_action('wp_dashboard_setup', [new PerformanceDashboardWidget(), 'register']);
+        }
+
+        // Phase 1.5: Inject GSC context into AI prompts
+        add_filter('aisa_prompt_variables', [$this, 'addGSCContext'], 10, 2);
+
+        // Phase 1.5: Add GSC connection status to editor script data
+        add_filter('aisa_editor_script_data', [$this, 'addGSCData']);
     }
 
     /**
@@ -112,5 +140,25 @@ class Plugin
     public function getSettings(): array
     {
         return get_option('aisa_settings', Activator::getDefaultSettings());
+    }
+
+    /**
+     * Inject GSC context into AI prompt variables (Phase 1.5).
+     */
+    public function addGSCContext(array $variables, int $postId): array
+    {
+        if (empty($variables['gsc_context'])) {
+            $variables['gsc_context'] = GSCContextBuilder::build($postId);
+        }
+        return $variables;
+    }
+
+    /**
+     * Add GSC connection status to editor script data (Phase 1.5).
+     */
+    public function addGSCData(array $data): array
+    {
+        $data['gscConnected'] = GSCAuthHandler::isConnected();
+        return $data;
     }
 }

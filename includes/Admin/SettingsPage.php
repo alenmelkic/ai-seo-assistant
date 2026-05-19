@@ -334,6 +334,98 @@ class SettingsPage
                     </tr>
                 </table>
 
+                <!-- Google Search Console (Phase 1.5) -->
+                <h2><?php esc_html_e('Google Search Console', 'ai-seo-assistant'); ?></h2>
+                <table class="form-table">
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Connection Status', 'ai-seo-assistant'); ?></th>
+                        <td>
+                            <?php if (\AiSeoAssistant\GSC\GSCAuthHandler::isConnected()): ?>
+                                <span style="color: #00a32a;">&#10003; <?php esc_html_e('Connected', 'ai-seo-assistant'); ?></span>
+                                <?php $property = \AiSeoAssistant\GSC\GSCAuthHandler::getSelectedProperty(); ?>
+                                <?php if ($property): ?>
+                                    <br /><strong><?php esc_html_e('Property:', 'ai-seo-assistant'); ?></strong> <?php echo esc_html($property); ?>
+                                <?php endif; ?>
+                                <br /><br />
+                                <a href="<?php echo esc_url(wp_nonce_url(add_query_arg('aisa_gsc_disconnect', '1'), 'aisa_gsc_disconnect')); ?>" class="button button-secondary">
+                                    <?php esc_html_e('Disconnect', 'ai-seo-assistant'); ?>
+                                </a>
+                            <?php else: ?>
+                                <span style="color: #d63638;">&#10007; <?php esc_html_e('Not connected', 'ai-seo-assistant'); ?></span>
+                                <?php $authUrl = \AiSeoAssistant\GSC\GSCAuthHandler::getAuthUrl(); ?>
+                                <?php if ($authUrl): ?>
+                                    <br /><br />
+                                    <a href="<?php echo esc_url($authUrl); ?>" class="button button-primary">
+                                        <?php esc_html_e('Connect to Google Search Console', 'ai-seo-assistant'); ?>
+                                    </a>
+                                <?php else: ?>
+                                    <br /><span class="description"><?php esc_html_e('Enter your Google Client ID and Secret below first.', 'ai-seo-assistant'); ?></span>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="aisa_gsc_client_id"><?php esc_html_e('Google Client ID', 'ai-seo-assistant'); ?></label>
+                        </th>
+                        <td>
+                            <input type="text" name="aisa_gsc_client_id" id="aisa_gsc_client_id"
+                                   value="<?php echo esc_attr(get_option('aisa_gsc_client_id', '')); ?>"
+                                   class="regular-text" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="aisa_gsc_client_secret"><?php esc_html_e('Google Client Secret', 'ai-seo-assistant'); ?></label>
+                        </th>
+                        <td>
+                            <input type="password" name="aisa_gsc_client_secret" id="aisa_gsc_client_secret"
+                                   value="<?php echo esc_attr(get_option('aisa_gsc_client_secret', '')); ?>"
+                                   class="regular-text" autocomplete="off" />
+                        </td>
+                    </tr>
+                    <?php if (\AiSeoAssistant\GSC\GSCAuthHandler::isConnected()): ?>
+                    <tr>
+                        <th scope="row">
+                            <label for="aisa_gsc_property"><?php esc_html_e('Select Property', 'ai-seo-assistant'); ?></label>
+                        </th>
+                        <td>
+                            <?php
+                            $properties = \AiSeoAssistant\GSC\GSCAuthHandler::fetchProperties();
+                            $currentProperty = \AiSeoAssistant\GSC\GSCAuthHandler::getSelectedProperty();
+                            ?>
+                            <select name="aisa_gsc_property" id="aisa_gsc_property">
+                                <option value=""><?php esc_html_e('— Select —', 'ai-seo-assistant'); ?></option>
+                                <?php foreach ($properties as $prop): ?>
+                                    <option value="<?php echo esc_attr($prop['url']); ?>"
+                                        <?php selected($currentProperty, $prop['url']); ?>>
+                                        <?php echo esc_html($prop['url']); ?> (<?php echo esc_html($prop['permission']); ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                    <tr>
+                        <th scope="row">
+                            <label for="aisa_scan_day"><?php esc_html_e('Weekly Scan Day', 'ai-seo-assistant'); ?></label>
+                        </th>
+                        <td>
+                            <select name="aisa_settings[scan_day]" id="aisa_scan_day">
+                                <?php
+                                $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                                $currentDay = $settings['scan_day'] ?? 'Sunday';
+                                foreach ($days as $day): ?>
+                                    <option value="<?php echo esc_attr($day); ?>" <?php selected($currentDay, $day); ?>>
+                                        <?php echo esc_html($day); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <span class="description"><?php esc_html_e('Day of the week for the automated SEO scan (runs at 03:00)', 'ai-seo-assistant'); ?></span>
+                        </td>
+                    </tr>
+                </table>
+
                 <!-- System Status -->
                 <h2><?php esc_html_e('System Status', 'ai-seo-assistant'); ?></h2>
                 <table class="form-table">
@@ -436,7 +528,26 @@ class SettingsPage
         // Clamp rate limit
         $sanitized['rate_limit'] = max(1, min(100, $sanitized['rate_limit']));
 
+        // Add scan_day to sanitized settings
+        $sanitized['scan_day'] = sanitize_text_field($input['scan_day'] ?? 'Sunday');
+
         update_option('aisa_settings', $sanitized);
+
+        // Save GSC credentials separately (not part of main settings array)
+        if (isset($_POST['aisa_gsc_client_id'])) {
+            update_option('aisa_gsc_client_id', sanitize_text_field($_POST['aisa_gsc_client_id']));
+        }
+        if (isset($_POST['aisa_gsc_client_secret'])) {
+            update_option('aisa_gsc_client_secret', sanitize_text_field($_POST['aisa_gsc_client_secret']));
+        }
+        if (isset($_POST['aisa_gsc_property'])) {
+            \AiSeoAssistant\GSC\GSCAuthHandler::setSelectedProperty(sanitize_text_field($_POST['aisa_gsc_property']));
+        }
+
+        // Handle GSC disconnect
+        if (isset($_GET['aisa_gsc_disconnect']) && wp_verify_nonce($_GET['_wpnonce'] ?? '', 'aisa_gsc_disconnect')) {
+            \AiSeoAssistant\GSC\GSCAuthHandler::disconnect();
+        }
 
         add_settings_error('aisa_settings', 'aisa_saved', __('Settings saved.', 'ai-seo-assistant'), 'success');
     }

@@ -12,6 +12,8 @@ class Activator
         self::createAuditTable();
         self::createBulkBatchesTable();
         self::createABTestTable();
+        self::createSuggestionsTable();
+        self::createOutcomesTable();
 
         Access\BypassManager::addCapability();
 
@@ -190,6 +192,63 @@ class Activator
             ended_at DATETIME NULL,
             PRIMARY KEY (id),
             INDEX idx_ability_status (ability, status)
+        ) {$charset_collate};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    }
+
+    private static function createSuggestionsTable(): void
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'aisa_suggestions';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+            id BIGINT AUTO_INCREMENT,
+            post_id BIGINT NOT NULL,
+            type VARCHAR(50) NOT NULL,
+            current_value TEXT NULL,
+            suggested_value TEXT NULL,
+            reason TEXT NULL,
+            gsc_snapshot JSON NULL,
+            status VARCHAR(20) NOT NULL DEFAULT 'pending',
+            snoozed_until DATETIME NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            reviewed_at DATETIME NULL,
+            reviewed_by BIGINT NULL,
+            PRIMARY KEY (id),
+            INDEX idx_status_created (status, created_at),
+            INDEX idx_post_id (post_id)
+        ) {$charset_collate};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    }
+
+    private static function createOutcomesTable(): void
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'aisa_outcomes';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+            id BIGINT AUTO_INCREMENT,
+            suggestion_id BIGINT NOT NULL,
+            post_id BIGINT NOT NULL,
+            type VARCHAR(50) NOT NULL,
+            gsc_before JSON NULL,
+            gsc_after JSON NULL,
+            position_change DECIMAL(5,1) NULL,
+            ctr_change DECIMAL(5,2) NULL,
+            impressions_change INT NULL,
+            measured_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            INDEX idx_suggestion_id (suggestion_id),
+            INDEX idx_post_id (post_id),
+            INDEX idx_measured_at (measured_at)
         ) {$charset_collate};";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';

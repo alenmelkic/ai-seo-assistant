@@ -12,6 +12,12 @@ abstract class AbstractPrompt implements PromptInterface
         $variables['brand_voice'] = $variables['brand_voice'] ?? PromptRegistry::buildBrandVoiceBlock();
         $variables['gsc_context'] = $variables['gsc_context'] ?? '';
 
+        // Phase 1.5: Allow GSC context injection via filter
+        $postId = $variables['post_id'] ?? 0;
+        if ($postId > 0) {
+            $variables = apply_filters('aisa_prompt_variables', $variables, $postId);
+        }
+
         return PromptRegistry::renderTemplate($template, $variables);
     }
 

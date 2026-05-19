@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { STORE_NAME } from '../../store';
 import usePostContent from '../../hooks/usePostContent';
+import GSCPanel from './GSCPanel';
 
 export default function SidebarPanel() {
 	const dispatch = useDispatch( STORE_NAME );
@@ -79,6 +80,8 @@ export default function SidebarPanel() {
 						</Button>
 					</PanelRow>
 				</PanelBody>
+
+				<GSCPanel />
 
 				<PanelBody
 					title={ __( 'AEO Data', 'ai-seo-assistant' ) }
