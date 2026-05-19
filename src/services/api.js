@@ -25,7 +25,7 @@ export async function confirmSEO( data ) {
 
 export async function getAEOData( postId ) {
 	return apiFetch( {
-		path: `ai-seo-assistant/v1/aeo/${ postId }`,
+		path: `ai-seo-assistant/v1/aeo/${ parseInt( postId, 10 ) }`,
 	} );
 }
 

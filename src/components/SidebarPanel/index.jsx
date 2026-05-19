@@ -11,7 +11,7 @@ export default function SidebarPanel() {
 	const { confirmed, aeoTldr, aeoMainQuestion } = usePostContent();
 
 	const getStatusBadge = () => {
-		if ( ! confirmed ) {
+		if ( ! confirmed || typeof confirmed !== 'object' ) {
 			return {
 				text: __( 'Not reviewed', 'ai-seo-assistant' ),
 				className: 'aisa-status--not-reviewed',

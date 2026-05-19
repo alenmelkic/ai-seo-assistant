@@ -68,7 +68,10 @@ class SuggestionRepository
         }
 
         $whereClause = implode(' AND ', $where);
-        $orderBy = $args['orderby'] ?? 'created_at';
+        $allowedOrderBy = ['created_at', 'reviewed_at', 'status', 'type', 'post_id', 'id'];
+        $orderBy = in_array($args['orderby'] ?? 'created_at', $allowedOrderBy, true)
+            ? $args['orderby']
+            : 'created_at';
         $order = strtoupper($args['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
         $limit = min(absint($args['per_page'] ?? 20), 100);
         $offset = absint($args['offset'] ?? 0);

@@ -89,7 +89,7 @@ function extractListItems( block ) {
 }
 
 function stripHtml( html ) {
-	const tmp = document.createElement( 'div' );
-	tmp.innerHTML = html;
-	return tmp.textContent || tmp.innerText || '';
+	// Use DOMParser instead of innerHTML to avoid executing scripts/event handlers
+	const doc = new DOMParser().parseFromString( html, 'text/html' );
+	return doc.body.textContent || '';
 }

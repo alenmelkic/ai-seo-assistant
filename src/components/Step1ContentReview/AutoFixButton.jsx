@@ -16,11 +16,19 @@ export default function AutoFixButton( { autofix, onApplied } ) {
 		const blockEditor = wpDispatch( 'core/block-editor' );
 		if ( ! blockEditor ) return;
 
+		const ALLOWED_BLOCK_TYPES = [ 'heading', 'paragraph', 'list', 'quote' ];
+
 		try {
 			switch ( autofix.action ) {
 				case 'insert_block': {
 					const { block_type, content, position } = autofix.data || {};
 					if ( ! block_type || ! content ) break;
+
+					// Only allow safe block types — reject arbitrary types like 'html'
+					if ( ! ALLOWED_BLOCK_TYPES.includes( block_type ) ) {
+						console.warn( 'Auto-fix: blocked disallowed block type:', block_type );
+						break;
+					}
 
 					let newBlock;
 					if ( block_type === 'heading' ) {
@@ -28,8 +36,6 @@ export default function AutoFixButton( { autofix, onApplied } ) {
 							content,
 							level: autofix.data.level || 2,
 						} );
-					} else if ( block_type === 'paragraph' ) {
-						newBlock = createBlock( 'core/paragraph', { content } );
 					} else {
 						newBlock = createBlock( `core/${ block_type }`, {
 							content,
@@ -52,6 +58,9 @@ export default function AutoFixButton( { autofix, onApplied } ) {
 							.select( 'core/block-editor' )
 							.getBlocks() || [];
 
+					// Escape $ metacharacters in replacement to prevent String.replace() special patterns
+					const safeReplacement = replacement.replace( /\$/g, '$$$$' );
+
 					for ( const block of blocks ) {
 						if (
 							block.attributes?.content &&
@@ -60,7 +69,7 @@ export default function AutoFixButton( { autofix, onApplied } ) {
 							blockEditor.updateBlockAttributes( block.clientId, {
 								content: block.attributes.content.replace(
 									original,
-									replacement
+									safeReplacement
 								),
 							} );
 							break;

@@ -43,7 +43,7 @@ export default function ReviewModal() {
 		if ( isModalOpen ) {
 			runAll();
 		}
-	}, [ isModalOpen ] );
+	}, [ isModalOpen, runAll ] );
 
 	const handleClose = useCallback( () => {
 		dispatch.setModalOpen( false );
@@ -97,10 +97,7 @@ export default function ReviewModal() {
 				dispatch.setModalOpen( false );
 				dispatch.setCurrentStep( 1 );
 
-				// Resume the publish action
-				wp.data
-					.dispatch( 'core/editor' )
-					.savePost();
+				// unlockPostSaving in editor-integration.js will resume the save
 			}
 		} catch ( err ) {
 			dispatch.setError( 'confirm', err.message );
@@ -128,7 +125,7 @@ export default function ReviewModal() {
 			dispatch.setModalOpen( false );
 			dispatch.setCurrentStep( 1 );
 
-			wp.data.dispatch( 'core/editor' ).savePost();
+			// unlockPostSaving in editor-integration.js will resume the save
 		} catch ( err ) {
 			dispatch.setError( 'confirm', err.message );
 		} finally {

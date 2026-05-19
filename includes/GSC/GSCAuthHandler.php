@@ -42,6 +42,11 @@ class GSCAuthHandler
             return '';
         }
 
+        // Use a one-time transient for OAuth state (more secure than reusable nonces)
+        $state = wp_generate_password(32, false);
+        $userId = get_current_user_id();
+        set_transient('aisa_gsc_oauth_state_' . $userId, $state, 10 * MINUTE_IN_SECONDS);
+
         return self::AUTH_URL . '?' . http_build_query([
             'client_id' => $clientId,
             'redirect_uri' => self::getRedirectUri(),
@@ -49,7 +54,7 @@ class GSCAuthHandler
             'scope' => self::SCOPE,
             'access_type' => 'offline',
             'prompt' => 'consent',
-            'state' => wp_create_nonce('aisa_gsc_oauth'),
+            'state' => $state,
         ]);
     }
 
@@ -59,13 +64,24 @@ class GSCAuthHandler
             return false;
         }
 
+        // Capability check — only admins with manage_aisa can complete OAuth
+        if (!current_user_can('manage_aisa')) {
+            Logger::error('GSC OAuth: Unauthorized callback attempt');
+            return false;
+        }
+
         if (!isset($_GET['code'])) {
             Logger::error('GSC OAuth: No authorization code received');
             return false;
         }
 
-        if (!isset($_GET['state']) || !wp_verify_nonce($_GET['state'], 'aisa_gsc_oauth')) {
-            Logger::error('GSC OAuth: Invalid state nonce');
+        // Verify one-time state transient
+        $userId = get_current_user_id();
+        $storedState = get_transient('aisa_gsc_oauth_state_' . $userId);
+        delete_transient('aisa_gsc_oauth_state_' . $userId);
+
+        if (!$storedState || !isset($_GET['state']) || !hash_equals($storedState, sanitize_text_field($_GET['state']))) {
+            Logger::error('GSC OAuth: Invalid or expired state parameter');
             return false;
         }
 

@@ -24,7 +24,7 @@ export default function GSCPanel() {
 			setLoading( true );
 			try {
 				const result = await apiFetch( {
-					path: `ai-seo-assistant/v1/gsc/${ postId }?refresh=${ refresh }`,
+					path: `ai-seo-assistant/v1/gsc/${ parseInt( postId, 10 ) }?refresh=${ refresh ? '1' : '0' }`,
 				} );
 				setGscData( result?.data || null );
 				setFetched( true );

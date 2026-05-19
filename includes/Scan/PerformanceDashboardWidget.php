@@ -54,7 +54,7 @@ class PerformanceDashboardWidget
                             <tr>
                                 <td><?php esc_html_e('Avg CTR change', 'ai-seo-assistant'); ?></td>
                                 <td>
-                                    <strong style="color: <?php echo $stats['avg_ctr_change'] >= 0 ? '#00a32a' : '#d63638'; ?>">
+                                    <strong style="color: <?php echo esc_attr($stats['avg_ctr_change'] >= 0 ? '#00a32a' : '#d63638'); ?>">
                                         <?php echo $stats['avg_ctr_change'] >= 0 ? '+' : ''; ?><?php echo esc_html($stats['avg_ctr_change']); ?>pp
                                     </strong>
                                 </td>
@@ -64,7 +64,7 @@ class PerformanceDashboardWidget
                             <tr>
                                 <td><?php esc_html_e('Avg position change', 'ai-seo-assistant'); ?></td>
                                 <td>
-                                    <strong style="color: <?php echo $stats['avg_position_change'] >= 0 ? '#00a32a' : '#d63638'; ?>">
+                                    <strong style="color: <?php echo esc_attr($stats['avg_position_change'] >= 0 ? '#00a32a' : '#d63638'); ?>">
                                         <?php echo $stats['avg_position_change'] >= 0 ? '+' : ''; ?><?php echo esc_html($stats['avg_position_change']); ?>
                                     </strong>
                                     <span style="font-size: 12px; color: #757575;">

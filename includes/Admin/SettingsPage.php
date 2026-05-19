@@ -14,6 +14,7 @@ class SettingsPage
             wp_die(__('You do not have permission to access this page.', 'ai-seo-assistant'));
         }
 
+        $this->handleGSCDisconnect();
         $this->handleSave();
 
         $settings = get_option('aisa_settings', Activator::getDefaultSettings());
@@ -544,11 +545,24 @@ class SettingsPage
             \AiSeoAssistant\GSC\GSCAuthHandler::setSelectedProperty(sanitize_text_field($_POST['aisa_gsc_property']));
         }
 
-        // Handle GSC disconnect
-        if (isset($_GET['aisa_gsc_disconnect']) && wp_verify_nonce($_GET['_wpnonce'] ?? '', 'aisa_gsc_disconnect')) {
-            \AiSeoAssistant\GSC\GSCAuthHandler::disconnect();
+        add_settings_error('aisa_settings', 'aisa_saved', __('Settings saved.', 'ai-seo-assistant'), 'success');
+    }
+
+    private function handleGSCDisconnect(): void
+    {
+        if (!isset($_GET['aisa_gsc_disconnect'])) {
+            return;
         }
 
-        add_settings_error('aisa_settings', 'aisa_saved', __('Settings saved.', 'ai-seo-assistant'), 'success');
+        if (!current_user_can('manage_aisa')) {
+            return;
+        }
+
+        if (!wp_verify_nonce($_GET['_wpnonce'] ?? '', 'aisa_gsc_disconnect')) {
+            return;
+        }
+
+        \AiSeoAssistant\GSC\GSCAuthHandler::disconnect();
+        add_settings_error('aisa_settings', 'aisa_gsc_disconnected', __('Google Search Console disconnected.', 'ai-seo-assistant'), 'success');
     }
 }

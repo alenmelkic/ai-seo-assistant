@@ -129,6 +129,12 @@ class SuggestionsController
     public function getGSCData(\WP_REST_Request $request): \WP_REST_Response
     {
         $postId = (int) $request->get_param('post_id');
+
+        // Verify the user can edit this specific post
+        if (!current_user_can('edit_post', $postId)) {
+            return new \WP_REST_Response(['error' => 'Permission denied for this post'], 403);
+        }
+
         $refresh = $request->get_param('refresh');
 
         $data = GSCDataFetcher::getPostData($postId, $refresh);

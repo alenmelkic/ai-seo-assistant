@@ -19,8 +19,7 @@ export default function Step1ContentReview( { onRegenerate } ) {
 				error: store.getError( 'analyze_content' ),
 				appliedFixes: store.getAppliedFixes(),
 			};
-		},
-		[]
+		}
 	);
 
 	const handleAutoFixApplied = useCallback(
